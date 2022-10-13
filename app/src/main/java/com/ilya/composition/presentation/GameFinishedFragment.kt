@@ -1,13 +1,12 @@
 package com.ilya.composition.presentation
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentGameFinishedBinding
 import com.ilya.composition.domain.entity.GameResult
 
@@ -44,19 +43,13 @@ class GameFinishedFragment : Fragment() {
             }
         )
         binding.buttonRetry.setOnClickListener {
-            launchWelcomeFragment()
+            retryGame()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    fun launchWelcomeFragment() {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, WelcomeFragment.newInstance())
-            .commit()
     }
 
     private fun retryGame() {
@@ -66,8 +59,10 @@ class GameFinishedFragment : Fragment() {
         )
     }
 
-    fun parsArgs() {
-        gameResult = requireArguments().getSerializable(ARG_GAME_RESULT) as GameResult
+    private fun parsArgs() {
+        requireArguments().getParcelable<GameResult>(ARG_GAME_RESULT)?.let {
+            gameResult = it
+        }
     }
 
     companion object {
@@ -77,7 +72,7 @@ class GameFinishedFragment : Fragment() {
         fun newInstance(gameResult: GameResult) =
             GameFinishedFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ARG_GAME_RESULT, gameResult)
+                    putParcelable(ARG_GAME_RESULT, gameResult)
                 }
             }
     }

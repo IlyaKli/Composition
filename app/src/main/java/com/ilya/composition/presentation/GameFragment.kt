@@ -43,15 +43,17 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    fun launchGameFinishedFragment(gameResult: GameResult) {
+    private fun launchGameFinishedFragment(gameResult: GameResult) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, GameFinishedFragment.newInstance(gameResult))
             .addToBackStack(null)
             .commit()
     }
 
-    fun parsArgs() {
-        level = requireArguments().getSerializable(ARG_LEVEL) as Level?
+    private fun parsArgs() {
+        requireArguments().getParcelable<Level>(ARG_LEVEL)?.let {
+            level = it
+        }
     }
 
     companion object {
@@ -63,7 +65,7 @@ class GameFragment : Fragment() {
         fun newInstance(level: Level) =
             GameFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ARG_LEVEL, level)
+                    putParcelable(ARG_LEVEL, level)
                 }
             }
     }

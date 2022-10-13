@@ -1,13 +1,12 @@
 package com.ilya.composition.presentation
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentChooseLevelBinding
-import com.ilya.composition.databinding.FragmentWelcomeBinding
 import com.ilya.composition.domain.entity.Level
 
 
@@ -16,10 +15,6 @@ class ChooseLevelFragment : Fragment() {
     private var _binding: FragmentChooseLevelBinding? = null
     private val binding: FragmentChooseLevelBinding
         get() = _binding ?: throw RuntimeException("FragmentChooseLevelBinding = null")
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +45,7 @@ class ChooseLevelFragment : Fragment() {
         }
     }
 
-    fun launchGameFragment(level: Level) {
+    private fun launchGameFragment(level: Level) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, GameFragment.newInstance(level))
             .addToBackStack(GameFragment.NAME)
