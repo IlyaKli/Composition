@@ -9,15 +9,18 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentGameBinding
 import com.ilya.composition.domain.entity.GameResult
 import com.ilya.composition.domain.entity.Level
 
 class GameFragment : Fragment() {
-    private lateinit var level: Level
 
-    val gameViewModelFactory by lazy { GameViewModelFactory(level, requireActivity().application) }
+    private val args by navArgs<GameFragmentArgs>()
+
+    private val gameViewModelFactory by lazy { GameViewModelFactory(args.level, requireActivity().application) }
 
     private val gameViewModel by lazy {
         ViewModelProvider(this, gameViewModelFactory)[GameViewModel::class.java]
@@ -40,7 +43,6 @@ class GameFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        parsArgs()
     }
 
     override fun onCreateView(
@@ -102,7 +104,7 @@ class GameFragment : Fragment() {
         }
     }
 
-    fun getColorByState(goodeState: Boolean): Int {
+    private fun getColorByState(goodeState: Boolean): Int {
         val colorResId = if (goodeState) {
             android.R.color.holo_green_light
         } else {
@@ -112,22 +114,13 @@ class GameFragment : Fragment() {
     }
 
     private fun launchGameFinishedFragment(gameResult: GameResult) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, GameFinishedFragment.newInstance(gameResult))
-            .addToBackStack(null)
-            .commit()
-    }
-
-    private fun parsArgs() {
-        requireArguments().getParcelable<Level>(ARG_LEVEL)?.let {
-            level = it
-        }
+        findNavController().navigate(GameFragmentDirections.actionGameFragmentToGameFinishedFragment2(gameResult))
     }
 
     companion object {
 
         const val NAME = "GameFragment"
-        private const val ARG_LEVEL = "level"
+        const val ARG_LEVEL = "level"
 
         @JvmStatic
         fun newInstance(level: Level) =

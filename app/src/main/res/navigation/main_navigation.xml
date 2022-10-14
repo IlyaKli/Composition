@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/welcomeFragment">
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.ilya.composition.presentation.WelcomeFragment"
+        android:label="WelcomeFragment" >
+        <action
+            android:id="@+id/action_welcomeFragment_to_chooseLevelFragment2"
+            app:destination="@id/chooseLevelFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/chooseLevelFragment2"
+        android:name="com.ilya.composition.presentation.ChooseLevelFragment"
+        android:label="fragment_choose_level"
+        tools:layout="@layout/fragment_choose_level" >
+        <action
+            android:id="@+id/action_chooseLevelFragment2_to_gameFragment"
+            app:destination="@id/gameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.ilya.composition.presentation.GameFragment"
+        android:label="fragment_game"
+        tools:layout="@layout/fragment_game" >
+        <action
+            android:id="@+id/action_gameFragment_to_gameFinishedFragment2"
+            app:destination="@id/gameFinishedFragment2"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="level"
+            app:argType="com.ilya.composition.domain.entity.Level" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFinishedFragment2"
+        android:name="com.ilya.composition.presentation.GameFinishedFragment"
+        android:label="fragment_game_finished"
+        tools:layout="@layout/fragment_game_finished" >
+        <argument
+            android:name="gameResult"
+            app:argType="com.ilya.composition.domain.entity.GameResult" />
+    </fragment>
+</navigation>
