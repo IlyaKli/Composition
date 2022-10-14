@@ -2,37 +2,37 @@ package com.ilya.composition.presentation
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentGameBinding
 import com.ilya.composition.domain.entity.GameResult
-import com.ilya.composition.domain.entity.GameSettings
 import com.ilya.composition.domain.entity.Level
-import kotlin.properties.Delegates
 
 class GameFragment : Fragment() {
+    private lateinit var level: Level
 
-    private val gameViewModel by lazy { ViewModelProvider(
-        this,
-        ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-    )[GameViewModel::class.java] }
+    val gameViewModelFactory by lazy { GameViewModelFactory(level, requireActivity().application) }
 
-    private var level: Level? = null
+    private val gameViewModel by lazy {
+        ViewModelProvider(this, gameViewModelFactory)[GameViewModel::class.java]
+    }
 
-    val tvOptions by lazy { mutableListOf<TextView>().apply {
-        add(binding.tvOption1)
-        add(binding.tvOption2)
-        add(binding.tvOption3)
-        add(binding.tvOption4)
-        add(binding.tvOption5)
-        add(binding.tvOption6)
-    } }
+    private val tvOptions by lazy {
+        mutableListOf<TextView>().apply {
+            add(binding.tvOption1)
+            add(binding.tvOption2)
+            add(binding.tvOption3)
+            add(binding.tvOption4)
+            add(binding.tvOption5)
+            add(binding.tvOption6)
+        }
+    }
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
@@ -41,7 +41,6 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parsArgs()
-        level?.let { gameViewModel.startGame(it) }
     }
 
     override fun onCreateView(
@@ -55,7 +54,6 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         gameViewModelObserver()
-        gameViewModel.startGame(level!!)
         clickListener()
     }
 
@@ -110,7 +108,7 @@ class GameFragment : Fragment() {
         } else {
             android.R.color.holo_red_light
         }
-        return ContextCompat.getColor(requireContext() ,colorResId)
+        return ContextCompat.getColor(requireContext(), colorResId)
     }
 
     private fun launchGameFinishedFragment(gameResult: GameResult) {
