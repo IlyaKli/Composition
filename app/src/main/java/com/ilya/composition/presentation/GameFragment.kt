@@ -1,10 +1,13 @@
 package com.ilya.composition.presentation
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentGameBinding
@@ -15,13 +18,21 @@ import kotlin.properties.Delegates
 
 class GameFragment : Fragment() {
 
-    val gameViewModel by lazy { ViewModelProvider(this)[GameViewModel::class.java] }
+    private val gameViewModel by lazy { ViewModelProvider(
+        this,
+        ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+    )[GameViewModel::class.java] }
 
     private var level: Level? = null
 
-    var minCountOfRightAnswers by Delegates.notNull<Int>()
-
-    var rightAnswers = 0
+    val tvOptions by lazy { mutableListOf<TextView>().apply {
+        add(binding.tvOption1)
+        add(binding.tvOption2)
+        add(binding.tvOption3)
+        add(binding.tvOption4)
+        add(binding.tvOption5)
+        add(binding.tvOption6)
+    } }
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
@@ -30,7 +41,7 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parsArgs()
-        level?.let { gameViewModel.getGameSettings(it) }
+        level?.let { gameViewModel.startGame(it) }
     }
 
     override fun onCreateView(
@@ -43,10 +54,8 @@ class GameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.tvOption1.setOnClickListener {
-            launchGameFinishedFragment(GameResult(true, 7, 8, GameSettings(15, 6, 80, 60)))
-        }
         gameViewModelObserver()
+        gameViewModel.startGame(level!!)
         clickListener()
     }
 
@@ -56,60 +65,52 @@ class GameFragment : Fragment() {
     }
 
     private fun clickListener() {
-        with(binding) {
-            tvOption1.setOnClickListener {
-                val answer = binding.tvOption1.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
-            }
-            tvOption2.setOnClickListener {
-                val answer = binding.tvOption2.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
-            }
-            tvOption3.setOnClickListener {
-                val answer = binding.tvOption3.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
-            }
-            tvOption4.setOnClickListener {
-                val answer = binding.tvOption4.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
-            }
-            tvOption5.setOnClickListener {
-                val answer = binding.tvOption5.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
-            }
-            tvOption6.setOnClickListener {
-                val answer = binding.tvOption6.text.toString().toInt()
-                gameViewModel.isRightAnswer(answer)
+        for (tvOption in tvOptions) {
+            tvOption.setOnClickListener {
+                gameViewModel.chooseAnswer(tvOption.text.toString().toInt())
             }
         }
     }
 
     private fun gameViewModelObserver() {
-        gameViewModel.isRightAnswer.observe(viewLifecycleOwner) {
-            if (it == true) {
-                rightAnswers++
-                binding.tvAnswersProgress.text = "$rightAnswers, $minCountOfRightAnswers"
-            }
-            gameViewModel.generateQuestion()
-        }
-
-        gameViewModel.gameSettings.observe(viewLifecycleOwner) {
-            gameViewModel.generateQuestion()
-           minCountOfRightAnswers = it.minCountOfRightAnswers
-        }
-
         gameViewModel.question.observe(viewLifecycleOwner) {
             binding.tvSum.text = it.sum.toString()
             binding.tvLeftNumber.text = it.visibleNumber.toString()
-            val string = String.format("%s, %s", rightAnswers, minCountOfRightAnswers)
-            binding.tvAnswersProgress.text = string
-            binding.tvOption1.text = it.options[0].toString()
-            binding.tvOption2.text = it.options[1].toString()
-            binding.tvOption3.text = it.options[2].toString()
-            binding.tvOption4.text = it.options[3].toString()
-            binding.tvOption5.text = it.options[4].toString()
-            binding.tvOption6.text = it.options[5].toString()
+            for (i in 0 until tvOptions.size) {
+                tvOptions[i].text = it.options[i].toString()
+            }
         }
+        gameViewModel.percentOfRightAnswer.observe(viewLifecycleOwner) {
+            binding.progressBar.setProgress(it, true)
+        }
+        gameViewModel.enoughCount.observe(viewLifecycleOwner) {
+            binding.tvAnswersProgress.setTextColor(getColorByState(it))
+        }
+        gameViewModel.enoughPercent.observe(viewLifecycleOwner) {
+            val color = getColorByState(it)
+            binding.progressBar.progressTintList = ColorStateList.valueOf(color)
+        }
+        gameViewModel.formattedTime.observe(viewLifecycleOwner) {
+            binding.tvTimer.text = it
+        }
+        gameViewModel.minPercent.observe(viewLifecycleOwner) {
+            binding.progressBar.secondaryProgress = it
+        }
+        gameViewModel.gameResult.observe(viewLifecycleOwner) {
+            launchGameFinishedFragment(it)
+        }
+        gameViewModel.progressAnswers.observe(viewLifecycleOwner) {
+            binding.tvAnswersProgress.text = it
+        }
+    }
+
+    fun getColorByState(goodeState: Boolean): Int {
+        val colorResId = if (goodeState) {
+            android.R.color.holo_green_light
+        } else {
+            android.R.color.holo_red_light
+        }
+        return ContextCompat.getColor(requireContext() ,colorResId)
     }
 
     private fun launchGameFinishedFragment(gameResult: GameResult) {
