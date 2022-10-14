@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentGameFinishedBinding
 import com.ilya.composition.domain.entity.GameResult
 
@@ -34,6 +35,11 @@ class GameFinishedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setResult()
+        clickListener()
+    }
+
+    private fun clickListener() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -44,6 +50,38 @@ class GameFinishedFragment : Fragment() {
         )
         binding.buttonRetry.setOnClickListener {
             retryGame()
+        }
+    }
+
+    private fun setResult() {
+        if (gameResult.winner) {
+            binding.emojiResult.setImageResource(R.drawable.ic_smile)
+        } else {
+            binding.emojiResult.setImageResource(R.drawable.ic_sad)
+        }
+        binding.tvRequiredAnswers.text = String.format(
+            getString(R.string.required_score),
+            gameResult.gameSettings.minCountOfRightAnswers
+        )
+        binding.tvScoreAnswers.text = String.format(
+            getString(R.string.score_answers),
+            gameResult.countOfRightAnswers.toString()
+        )
+        binding.tvRequiredPercentage.text = String.format(
+            getString(R.string.required_percentage),
+            gameResult.gameSettings.minPercentOfRightAnswers.toString()
+        )
+        binding.tvScorePercentage.text = String.format(
+            getString(R.string.score_percentage),
+            calculateScorePercent()
+        )
+    }
+
+    private fun calculateScorePercent(): Int {
+        return if (gameResult.countOfQuestions == 0) {
+            0
+        } else {
+            (gameResult.countOfRightAnswers / gameResult.countOfQuestions.toDouble() * 100).toInt()
         }
     }
 
