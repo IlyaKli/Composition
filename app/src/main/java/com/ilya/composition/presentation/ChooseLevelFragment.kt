@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.ilya.composition.R
 import com.ilya.composition.databinding.FragmentChooseLevelBinding
 import com.ilya.composition.domain.entity.Level
 
@@ -55,12 +54,5 @@ class ChooseLevelFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        const val NAME = "ChooseLevelFragment"
-
-        @JvmStatic
-        fun newInstance() = ChooseLevelFragment()
     }
 }

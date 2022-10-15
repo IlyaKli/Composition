@@ -28,7 +28,7 @@ class GameViewModel(private val application: Application, private val level: Lev
 
     private var countOfQuestion = 0
 
-    lateinit var gameSettings: GameSettings
+    private lateinit var gameSettings: GameSettings
 
     private val _question = MutableLiveData<Question>()
     val question: LiveData<Question>
