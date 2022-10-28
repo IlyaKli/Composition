@@ -16,5 +16,5 @@ The application assumes different levels of complexity.
 ![Composition - game](https://user-images.githubusercontent.com/67061655/198725835-d392e5b6-94af-4da8-8f4c-aacc13fad042.jpg)
 
 
-# game result screen
+# Game result screen
 ![Composition - game result](https://user-images.githubusercontent.com/67061655/198725852-b7627bb2-94fa-451f-9d7a-028ccd083e82.jpg)
